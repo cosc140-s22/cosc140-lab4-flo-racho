@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth import models as auth_models
+from django.db.models import Avg
+
 
 class Product(models.Model):
     name = models.CharField(max_length=50, blank=False)
@@ -17,3 +20,16 @@ class Product(models.Model):
             return f"Age {self.minimum_age_appropriate}"
         else:
             return f"Ages {self.minimum_age_appropriate} to {self.maximum_age_appropriate}"
+    def avg_rating(self):
+     return self.review_set.aggregate(Avg('stars'))['stars__avg']
+
+
+class Review(models.Model):
+  stars=models.IntegerField(default=1)
+  review=models.TextField()
+  product = models.ForeignKey(Product, on_delete=models.CASCADE)
+  user = models.ForeignKey(auth_models.User, models.CASCADE)
+  def __str__(self):
+    return f"Review for {self.product.name}, {self.stars} stars"
+    
+    
